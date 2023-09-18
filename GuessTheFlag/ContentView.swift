@@ -31,6 +31,8 @@ struct ContentView: View {
                     } label: {
                         Image(countries[number])
                             .renderingMode(.original)
+                            .clipShape(Capsule())
+                            .shadow(radius: 5)
                     }
                     .alert(scoreTitle, isPresented: $isShowingScore) {
                         Button("Continue", action: askQuestion)
