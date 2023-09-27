@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  GuessTheFlag
 //
-//  Created by GIGL iOS on 13/04/2023.
+//  Created by Tes on 13/04/2023.
 //
 
 import SwiftUI
@@ -11,7 +11,13 @@ struct ContentView: View {
     @State private var isShowingScore = false
     @State private var scoreTitle = ""
     @State private var evaluatedMessage = ""
-    @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US"].shuffled()
+    var numberOfQuestionsToBeAsked = 10
+    @State private var selectedCountry = ""
+//    @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US"].shuffled()
+    
+    @State private var countries = [
+    "Afghanistan", "Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Antarctica", "Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guernsey", "Guinea-Bissau", "Guinea", "Guyana", "Haiti", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Italy", "Ivory Coast", "Jamaica", "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kosovo", "Kuwait", "Kyrgyzstan", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macao", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat", "Morocco", "Mozambique", "Namibia", "Nauru", "Netherlands", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Niue", "North Korea", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcairn", "Poland", "Portugal", "Puerto Rico", "Qatar", "Réunion", "Romania", "Russia", "Rwanda", "Saint Lucia", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Swaziland", "Sweden", "Switzerland", "Syrian Arab Republic", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo", "Tokelau", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "UK", "Ukraine", "Uruguay", "US", "Uzbekistan", "Vanuatu", "Vatican City State", "Venezuela", "Vietnam", "Wallis and Futuna", "Western Sahara", "Yemen", "Zambia", "Zimbabwe"].shuffled()
+
     @State private var correctAnswer = Int.random(in: 0...2)
     @State private var userScore = 0
     @State private var numberOfQuestionsAsked = 0
@@ -51,8 +57,12 @@ struct ContentView: View {
                         } label: {
                             Image(countries[number])
                                 .renderingMode(.original)
-                                .clipShape(Capsule())
+                                .resizable(resizingMode: .tile)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
                                 .shadow(radius: 5)
+                                .frame(width: 200, height: 100)
                         }
                         .alert(scoreTitle, isPresented: $isShowingScore) {
                             Button("Continue", action: askQuestion)
@@ -60,7 +70,7 @@ struct ContentView: View {
                             if scoreTitle == "Correct" {
                                 Text("Your score is \(userScore)")
                             } else {
-                                Text("That is the flag of \(countries[number])")
+                                Text("That is the flag of \(selectedCountry)")
                             }
                         }
                     }
@@ -74,13 +84,14 @@ struct ContentView: View {
             .alert(evaluatedMessage, isPresented: $hasAnsweredFinalQuestion) {
                 Button("Restart", action: resetGame)
             } message: {
-                Text("Your were able to answer \(userScore) questions correctly out of 8 asked.")
+                Text("Your were able to answer \(userScore) questions correctly out of \(numberOfQuestionsToBeAsked) asked.")
             }
             .padding()
         }
     }
     
     func flagTapped(_ number: Int) {
+        selectedCountry = countries[number]
         if number == correctAnswer {
             scoreTitle = "Correct"
             self.userScore += 1
@@ -92,8 +103,8 @@ struct ContentView: View {
     }
     
     func askQuestion(){
-        if numberOfQuestionsAsked == 8 {
-            evaluatedMessage = userScore >= 4 ? "HURRAY!" : "EYYAH!"
+        if numberOfQuestionsAsked == numberOfQuestionsToBeAsked {
+            evaluatedMessage = userScore >= numberOfQuestionsToBeAsked / 2 ? "HURRAY!" : "EYYAH!"
             hasAnsweredFinalQuestion = true
         } else {
             countries.shuffle()
